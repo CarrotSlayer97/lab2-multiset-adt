@@ -29,7 +29,7 @@ public class BST {
 
 
     public boolean isEmpty() {
-        return false; // TODO implement me!
+        return root == null;
     }
 
     public boolean contains(int item) {
@@ -47,33 +47,95 @@ public class BST {
 
 
     public void insert(int item) {
-
+        if (this.isEmpty()){
+            this.root = item;
+            this.left = new BST();
+            this.right = new BST();
+        } else if (item < this.root) {
+            this.left.insert(item);
+        } else { // Duplicates go right
+            this.right.insert(item);
+        }
     }
 
 
     public void delete(int item) {
+        if (this.isEmpty()) {
+            return;
+        }
 
+        if (this.root == item) {
+            this.deleteRoot();
+        } else if (this.root < item) {
+            this.right.delete(item);
+        } else {
+            this.left.delete(item);
+        }
     }
 
     private void deleteRoot() {
-
+        if (this.left.isEmpty() && this.right.isEmpty()) {
+            this.root = null;
+            this.left = new BST();
+            this.right = new BST();
+        } else if (this.left.isEmpty()) {
+            BST rightChild = this.right;
+            this.root = rightChild.root;
+            this.left = rightChild.left;
+            this.right = rightChild.right;
+        } else if (this.right.isEmpty()) {
+            BST leftChild = this.left;
+            this.root = leftChild.root;
+            this.left = leftChild.left;
+            this.right = leftChild.right;
+        } else {
+            this.root = this.left.extractMax();
+        }
     }
 
 
     private int extractMax() {
-        return -1;
+        if (this.isEmpty()) {
+            throw new IllegalStateException("Cannot extract max from empty BST.");
+        }
+
+        if (this.right.isEmpty()) {
+            int max = this.root;
+            this.deleteRoot();;
+            return max;
+        } else {
+            return this.right.extractMax();
+        }
     }
 
     public int height() {
-        return -1;
+        if (this.isEmpty()) {
+            return 0;
+        }
+
+        return Math.max(this.left.height(), this.right.height()) + 1;
     }
 
     public int count(int item) {
-        return -1;
+        if (this.isEmpty()) {
+            return 0;
+        }
+
+        if (this.root == item) {
+            return 1 + this.right.count(item);
+        } else if (this.root < item) {
+            return this.right.count(item);
+        } else {
+            return this.left.count(item);
+        }
     }
 
     public int getSize() {
-        return -1;
+        if (this.isEmpty()) {
+            return 0;
+        }
+
+        return this.left.getSize() + this.right.getSize() + 1;
     }
 
     public static void main(String[] args) {
@@ -82,9 +144,17 @@ public class BST {
         // or else we won't be able to run your code on MarkUs since the file won't
         // compile. Always make sure to run the self tests on MarkUs after you update your code.
         BST bst = new BST();
-        int a = 1;
-        bst.insert(a);
-        System.out.println(bst.contains(a));
+
+        bst.insert(5);
+        bst.insert(3);
+        bst.insert(7);
+        bst.insert(6);
+
+        System.out.println("Size: " + bst.getSize());
+        System.out.println("Height: " + bst.height());
+        System.out.println("Contains 3: " + bst.contains(3));
+        bst.delete(3);
+        System.out.println("Size after delete: " + bst.getSize());
     }
 
 }
